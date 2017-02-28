@@ -1,0 +1,22 @@
+Project 4 references:
+
+http://athena.nitc.ac.in/guntupalli_b120618cs/MINIX/MINIX_Report.pdf
+
+http://www.cis.syr.edu/~wedu/seed/Documentation/Minix3/How_to_add_system_call.pdf
+
+http://berkeleyrc.blogspot.com/2010/05/adding-new-server-to-minix-316-kernel.html
+
+http://wiki.minix3.org/doku.php?id=developersguide:newkernelcall
+
+https://github.com/rhiguita/lab-minix/blob/master/eng_us/Seen2-Creating_a_System_Call-English.txt
+
+https://github.com/shervinshaikh/minix/blob/master/servers/sema/semaphore.c
+
+https://github.com/gbswanson/Semaphore-Service-for-Minix-3.2.1/blob/master/grad.c
+
+
+http://www.cs.ucsb.edu/~ravenben/classes/170/herder.pdf
+
+https://www.classes.cs.uchicago.edu/archive/2010/fall/51081-1/LabFAQ/lab7/Semaphores.html
+
+http://homepages.cs.ncl.ac.uk/nick.cook/csc2025/minix/syscall-exercise1.html

@@ -1,0 +1,131 @@
+diff -ruNp include.clean/minix/callnr.h include/minix/callnr.h
+--- include.clean/minix/callnr.h	Tue Oct 11 19:15:12 2016
++++ include/minix/callnr.h	Tue Nov  1 21:11:39 2016
+@@ -65,8 +65,7 @@
+ #define SETGROUPS_O	  66
+ #define GETMCONTEXT       67
+ #define SETMCONTEXT       68
+-/*numberprocs*/
+-#define NUMBERPROCS	  69
++#define SEM_INIT	  69
+ /* Posix signal handling. */
+ #define SIGACTION	  71
+ #define SIGSUSPEND	  72
+@@ -104,6 +103,12 @@
+ #define GETPROCNR	104	/* to PM */
+ #define ISSETUGID	106	/* to PM: ask if process is tainted */
+ #define GETEPINFO_O	107	/* to PM: get pid/uid/gid of an endpoint */
++#define SEM_DOWN 108
++#define SEM_UP 109
++#define SEM_RELEASE 110
++
++
++
+ #define SRV_KILL  	111	/* to PM: special kill call for RS */
+ 
+ #define GCOV_FLUSH	112	/* flush gcov data from server to gcov files */
+diff -ruNp include.clean/minix/com.h include/minix/com.h
+--- include.clean/minix/com.h	Tue Oct 11 19:15:12 2016
++++ include/minix/com.h	Sat Nov  5 00:41:27 2016
+@@ -80,7 +80,8 @@
+ #define VM_PROC_NR   ((endpoint_t) 8)   /* memory server */
+ #define PFS_PROC_NR  ((endpoint_t) 9)  /* pipe filesystem */
+ #define SCHED_PROC_NR ((endpoint_t) 10)	/* scheduler */
+-#define LAST_SPECIAL_PROC_NR	11	/* An untyped version for
++#define SEMA_PROC_NR ((endpoint_t) 11)	/* SEMAPHORE*/
++#define LAST_SPECIAL_PROC_NR	12	/* An untyped version for
+                                            computation in macros.*/
+ #define INIT_PROC_NR ((endpoint_t) LAST_SPECIAL_PROC_NR)  /* init
+                                                         -- goes multiuser */
+@@ -89,7 +90,8 @@
+ /* Root system process and root user process. */
+ #define ROOT_SYS_PROC_NR  RS_PROC_NR
+ #define ROOT_USR_PROC_NR  INIT_PROC_NR
+-
++#define SEM_NUMBER m1_i1
++#define SEM_VALUE m1_i2
+ /*===========================================================================*
+  *                	   Kernel notification types                         *
+  *===========================================================================*/
+diff -ruNp include.clean/mysyscalllib.h include/mysyscalllib.h
+--- include.clean/mysyscalllib.h	Wed Dec 31 19:00:00 1969
++++ include/mysyscalllib.h	Fri Oct 28 13:12:53 2016
+@@ -0,0 +1,7 @@
++#include <unistd.h>
++#include <lib.h>
++int do_mysyscall()
++{
++message m;
++return ( _syscall(PM_PROC_NR, MYSYSCALL, &m) );
++}
+diff -ruNp include.clean/numberprocslib.h include/numberprocslib.h
+--- include.clean/numberprocslib.h	Wed Dec 31 19:00:00 1969
++++ include/numberprocslib.h	Sat Oct  8 00:53:25 2016
+@@ -0,0 +1,7 @@
++#include <lib.h>
++	#include <unistd.h>
++	int numberprocs()
++	{
++		message m;
++		return ( _syscall(PM_PROC_NR, NUMBERPROCS, &m) );
++	}
+diff -ruNp include.clean/semaphoresyscall.h include/semaphoresyscall.h
+--- include.clean/semaphoresyscall.h	Wed Dec 31 19:00:00 1969
++++ include/semaphoresyscall.h	Fri Nov  4 23:54:50 2016
+@@ -0,0 +1,56 @@
++#include <sys/cdefs.h>
++#include <lib.h>
++#include <unistd.h>
++#include <minix/com.h>
++
++#include <sys/stat.h>
++
++#ifdef __weak_alias
++__weak_alias(sem_init, _sem_init)
++#endif
++
++int sem_init(int semaphore_number, int start_value)
++{
++    message m;
++    int r;
++    
++    m.SEM_VALUE = start_value;
++    m.SEM_NUMBER = semaphore_number;
++    r = _syscall(SEMA_PROC_NR, SEM_INIT, &m);
++    
++    return r;
++}
++
++int sem_up(int semaphore_number)
++{
++    message m;
++    int r;
++    
++    m.SEM_NUMBER = semaphore_number;
++    r = _syscall(SEMA_PROC_NR, SEM_UP, &m);
++    
++    return r;
++}
++
++int sem_down(int semaphore_number)
++{
++    message m;
++    int r;
++    
++    m.SEM_NUMBER = semaphore_number;
++    r = _syscall(SEMA_PROC_NR, SEM_DOWN, &m);
++    
++    return r;
++}
++
++int sem_release(int semaphore)
++{
++    message m;
++    int r;
++    
++    m.SEM_NUMBER = semaphore;
++    
++    r = _syscall(SEMA_PROC_NR, SEM_RELEASE, &m);
++    
++    return r;
++}
